@@ -1,0 +1,933 @@
+ 
+
+
+const batchContractBalanceSize = 350;  // размер пачки кошельков для одного call-вызова к контракту на чек баланса (можно настраивать)
+const batchRpcTxCountSize = 100;       // размер пачки кошельков для одного batch-запроса к ноде на чек nonce (можно настраивать)
+
+const mainSheetName = "BALANCES";
+const settingsSheetName = "COIN SETTINGS";
+
+const ethNode = "https://rpc.ankr.com/eth";
+const arbitrumNode = "https://rpc.ankr.com/arbitrum";
+const bscNode = "https://rpc.ankr.com/bsc";
+const polygonNode = "https://rpc.ankr.com/polygon";
+const optimismNode = "https://rpc.ankr.com/optimism";
+const avalancheNode = "https://rpc.ankr.com/avalanche";
+const fantomNode = "https://rpc.ankr.com/fantom";
+const eraNode = "https://rpc.ankr.com/zksync_era";
+const zksyncNode = "https://api.zksync.io/jsrpc";
+const novaNode = "https://rpc.ankr.com/arbitrumnova";
+const zoraNode = "https://rpc.zora.energy";
+const lineaNode = "https://rpc.linea.build";
+const baseNode = "https://rpc.ankr.com/base";
+const zkpolygonNode = "https://rpc.ankr.com/polygon_zkevm";
+const coreNode = "https://rpc.coredao.org";
+const gnosisNode = "https://rpc.ankr.com/gnosis";
+const goerliNode = "https://rpc.ankr.com/eth_goerli";
+const celoNode = "https://rpc.ankr.com/celo";
+const harmonyNode = "https://rpc.ankr.com/harmony";
+const opbnbNode = "https://opbnb-mainnet-rpc.bnbchain.org";
+const mantleNode = "https://rpc.ankr.com/mantle";
+const scrollNode = "https://rpc.ankr.com/scroll";
+
+const nativeAddress = "0x0000000000000000000000000000000000000000";
+
+const ethContractAddress = "0xb1f8e55c7f64d203c1400b9d8555d050f94adf39";
+const arbitrumContractAddress = "0x151E24A486D7258dd7C33Fb67E4bB01919B7B32c";
+const bscContractAddress = "0x2352c63A83f9Fd126af8676146721Fa00924d7e4";
+const polygonContractAddress = "0x2352c63A83f9Fd126af8676146721Fa00924d7e4";
+const optimismContractAddress = "0xB1c568e9C3E6bdaf755A60c7418C269eb11524FC";
+const avalancheContractAddress = "0xD023D153a0DFa485130ECFdE2FAA7e612EF94818";
+const fantomContractAddress = "0x07f697424ABe762bB808c109860c04eA488ff92B";
+const eraContractAddress = "0x875fb0451fb2787b1924edc1DE4083E5f63D99Df";
+const zksyncContractAddress = "";
+const novaContractAddress = "0x3008e6ad64a470c47f428e73214c2f1f4e79b72d";
+const zoraContractAddress = "0x6830d287fE1dab06ABe252911caD71F37a0514A3";
+const lineaContractAddress = "0x3008e6ad64a470c47f428e73214C2F1f4e79b72d";
+const baseContractAddress = "0x162708433f00dbc8624795f181ec1983e418ef11";
+const zkpolygonContractAddress = "0x162708433F00DBC8624795F181EC1983E418EF11";
+const coreContractAddress = "0xdAd633A2Ff9fb3Ab5d7a8bcfd089593c503c11a2";
+const gnosisContractAddress = "0xd08149E71671A284e3F99b371BaF29BB8eEA7387";
+const goerliContractAddress = "0x8242cd33761782f02bf10b7329cea5faf17b2bea";
+const moonbeamContractAddress = "0xf614056a46e293DD701B9eCeBa5df56B354b75f9";
+const moonriverContractAddress = "0xDEAa846cca7FEc9e76C8e4D56A55A75bb0973888";
+const auroraContractAddress = "0x100665685d533F65bdD0BD1d65ca6387FC4F4FDB";
+const tronContractAddress = "TN8RtFXeQZyFHGmH1iiSRm5r4CRz1yWkCf";
+const celoContractAddress = "0x6830d287fE1dab06ABe252911caD71F37a0514A3";
+const harmonyContractAddress = "0x3008e6ad64a470c47f428e73214c2f1f4e79b72d";
+const opbnbContractAddress = "0xa5Dba8e0B19F610d32546798b8B0100664BdC494";
+const mantleContractAddress = "0xf003d2063a7093FCf0b6B7e04B5AFd8c770d8B24";
+const scrollContractAddress = "0xd2DBceDE80D5359C180498bcaED832E22c9075F7";
+
+const rowCountCell = "O1";
+
+const ethOutputColumn = "C";
+const arbitrumOutputColumn = "F";
+const bscOutputColumn = "I";
+const polygonOutputColumn = "L";
+const optimismOutputColumn = "O";
+const avalancheOutputColumn = "R";
+const fantomOutputColumn = "U";
+const eraOutputColumn = "X";
+const zksyncOutputColumn = "AA";
+const novaOutputColumn = "AD";
+const zoraOutputColumn = "AG";
+const lineaOutputColumn = "AJ";
+const baseOutputColumn = "AM";
+const zkpolygonOutputColumn = "AP";
+const scrollOutputColumn = "AS";
+const mantleOutputColumn = "AV";
+const opbnbOutputColumn = "AY";
+const celoOutputColumn = "BB";
+const harmonyOutputColumn = "BE";
+const coreOutputColumn = "BH";
+const gnosisOutputColumn = "BK";
+const goerliOutputColumn = "BN";
+
+
+const ethErc20OutputColumn = "BR"
+const arbitrumErc20OutputColumn = "BT";
+const bscErc20OutputColumn = "BV";
+const polygonErc20OutputColumn = "BX";
+const optimismErc20OutputColumn = "BZ";
+const avalancheErc20OutputColumn = "CB";
+const fantomErc20OutputColumn = "CD";
+const eraErc20OutputColumn = "CF";
+const novaErc20OutputColumn = "CH";
+const zoraErc20OutputColumn = "CJ";
+const lineaErc20OutputColumn = "CL";
+const baseErc20OutputColumn = "CN";
+const zkpolygonErc20OutputColumn = "CP";
+const scrollErc20OutputColumn = "CR";
+const mantleErc20OutputColumn = "CT";
+const opbnbErc20OutputColumn = "CV";
+const celoErc20OutputColumn = "CX";
+const harmonyErc20OutputColumn = "CZ";
+const coreErc20OutputColumn = "DB";
+const gnosisErc20OutputColumn = "DD";
+
+
+function updateNative(){
+  var app = SpreadsheetApp;
+  var activeSheet = app.getActiveSpreadsheet().getSheetByName(mainSheetName);
+  var settingsSheet = app.getActiveSpreadsheet().getSheetByName(settingsSheetName);
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+  var customLastContentLine = getRows()
+  updateInfo(activeSheet)
+
+  var stableTokens = getStablesData(settingsSheet)
+
+  if(activeSheet.getRange(ethOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Ethereum', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, ethContractAddress, ethNode, ethOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, ethOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, ethNode, ethOutputColumn)
+  }
+  if(activeSheet.getRange(arbitrumOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Arbitrum', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, arbitrumContractAddress, arbitrumNode, arbitrumOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, arbitrumOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, arbitrumNode, arbitrumOutputColumn)
+  }
+  if(activeSheet.getRange(bscOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Bsc', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, bscContractAddress, bscNode, bscOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, bscOutputColumn, 'BNB', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, bscNode, bscOutputColumn)
+  }
+  if(activeSheet.getRange(polygonOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Polygon', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, polygonContractAddress, polygonNode, polygonOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, polygonOutputColumn, 'MATIC', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, polygonNode, polygonOutputColumn)
+  }
+  if(activeSheet.getRange(optimismOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Optimism', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, optimismContractAddress, optimismNode, optimismOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, optimismOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, optimismNode, optimismOutputColumn)
+  }
+  if(activeSheet.getRange(avalancheOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Avax', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, avalancheContractAddress, avalancheNode, avalancheOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, avalancheOutputColumn, 'AVAX', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, avalancheNode, avalancheOutputColumn)
+  }
+  if(activeSheet.getRange(fantomOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Fantom', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, fantomContractAddress, fantomNode, fantomOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, fantomOutputColumn, 'FTM', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, fantomNode, fantomOutputColumn)
+  }
+  if(activeSheet.getRange(eraOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Era', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, eraContractAddress, eraNode, eraOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, eraOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, eraNode, eraOutputColumn)
+  }
+  if(activeSheet.getRange(zksyncOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец ZK Lite', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, zksyncContractAddress, zksyncNode, zksyncOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, zksyncOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, zksyncNode, zksyncOutputColumn)
+  }
+  if(activeSheet.getRange(novaOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Nova', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, novaContractAddress, novaNode, novaOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, novaOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, novaNode, novaOutputColumn)
+  }
+  if(activeSheet.getRange(zoraOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Zora', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, zoraContractAddress, zoraNode, zoraOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, zoraOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, zoraNode, zoraOutputColumn)
+  }
+  if(activeSheet.getRange(lineaOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Linea', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, lineaContractAddress, lineaNode, lineaOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, lineaOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, lineaNode, lineaOutputColumn)
+  }
+  if(activeSheet.getRange(baseOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Base', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, baseContractAddress, baseNode, baseOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, baseOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, baseNode, baseOutputColumn)
+  }
+  if(activeSheet.getRange(zkpolygonOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Polygon ZK', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, zkpolygonContractAddress, zkpolygonNode, zkpolygonOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, zkpolygonOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, zkpolygonNode, zkpolygonOutputColumn)
+  }
+
+  if(activeSheet.getRange(scrollOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Scroll', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, scrollContractAddress, scrollNode, scrollOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, scrollOutputColumn, 'ETH', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, scrollNode, scrollOutputColumn)
+  }
+  if(activeSheet.getRange(mantleOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Mantle', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, mantleContractAddress, mantleNode, mantleOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, mantleOutputColumn, 'MNT', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, mantleNode, mantleOutputColumn)
+  }
+  if(activeSheet.getRange(opbnbOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец OpBnb', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, opbnbContractAddress, opbnbNode, opbnbOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, opbnbOutputColumn, 'BNB', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, opbnbNode, opbnbOutputColumn)
+  }
+  if(activeSheet.getRange(celoOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Celo', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, celoContractAddress, celoNode, celoOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, celoOutputColumn, 'CELO', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, celoNode, celoOutputColumn)
+  }
+  if(activeSheet.getRange(harmonyOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Harmony', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, harmonyContractAddress, harmonyNode, harmonyOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, harmonyOutputColumn, 'ONE', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, harmonyNode, harmonyOutputColumn)
+  }
+
+  if(activeSheet.getRange(coreOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Core', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, coreContractAddress, coreNode, coreOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, coreOutputColumn, 'CORE', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, coreNode, coreOutputColumn)
+  }
+  if(activeSheet.getRange(gnosisOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Gnosis', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, gnosisContractAddress, gnosisNode, gnosisOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, gnosisOutputColumn, 'DAI', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, gnosisNode, gnosisOutputColumn)
+  }
+  if(activeSheet.getRange(goerliOutputColumn+4).getValue()) {
+    spreadsheet.toast('Обновляю столбец Goerli', 'Информация');
+    getBalance(activeSheet, customLastContentLine, nativeAddress, goerliContractAddress, goerliNode, goerliOutputColumn);
+    calculateUsdValues(activeSheet, customLastContentLine, goerliOutputColumn, 'NoPrice', stableTokens);
+    getTxCount(activeSheet, customLastContentLine, goerliNode, goerliOutputColumn)
+  }
+}
+
+
+function updateErc20(){
+  var app = SpreadsheetApp;
+  var activeSheet = app.getActiveSpreadsheet().getSheetByName(mainSheetName);
+  var settingsSheet = app.getActiveSpreadsheet().getSheetByName(settingsSheetName);
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+  var customLastContentLine = getRows()
+  updateInfo(activeSheet)
+
+  var tokens = getTokensData(settingsSheet, customLastContentLine)
+  //SpreadsheetApp.getUi().alert("Уведомление", JSON.stringify(tokens), SpreadsheetApp.getUi().ButtonSet.OK);
+
+  var stableTokens = getStablesData(settingsSheet)
+  //SpreadsheetApp.getUi().alert("Уведомление", JSON.stringify(stableTokens), SpreadsheetApp.getUi().ButtonSet.OK);
+
+  if(activeSheet.getRange(getNextColumn(ethErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец ETHEREUM ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, ethErc20OutputColumn+5, "ETHEREUM", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "ETHEREUM", ethContractAddress, ethNode, ethErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(arbitrumErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец ARBITRUM ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, arbitrumErc20OutputColumn+5, "ARBITRUM", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "ARBITRUM", arbitrumContractAddress, arbitrumNode, arbitrumErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(bscErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец BSC ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, bscErc20OutputColumn+5, "BSC", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "BSC", bscContractAddress, bscNode, bscErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(polygonErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец POLYGON ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, polygonErc20OutputColumn+5, "POLYGON", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "POLYGON", polygonContractAddress, polygonNode, polygonErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(optimismErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец OPTIMISM ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, optimismErc20OutputColumn+5, "OPTIMISM", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "OPTIMISM", optimismContractAddress, optimismNode, optimismErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(avalancheErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец AVALANCHE ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, avalancheErc20OutputColumn+5, "AVALANCHE", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "AVALANCHE", avalancheContractAddress, avalancheNode, avalancheErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(fantomErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец FANTOM ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, fantomErc20OutputColumn+5, "FANTOM", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "FANTOM", fantomContractAddress, fantomNode, fantomErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(eraErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец ERA ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, eraErc20OutputColumn+5, "ERA", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "ERA", eraContractAddress, eraNode, eraErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(novaErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец NOVA ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, novaErc20OutputColumn+5, "NOVA", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "NOVA", novaContractAddress, novaNode, novaErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(zoraErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец ZORA ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, zoraErc20OutputColumn+5, "ZORA", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "ZORA", zoraContractAddress, zoraNode, zoraErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(lineaErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец LINEA ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, lineaErc20OutputColumn+5, "LINEA", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "LINEA", lineaContractAddress, lineaNode, lineaErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(baseErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец BASE ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, baseErc20OutputColumn+5, "BASE", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "BASE", baseContractAddress, baseNode, baseErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(zkpolygonErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец ZKPOLYGON ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, zkpolygonErc20OutputColumn+5, "ZKPOLYGON", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "ZKPOLYGON", zkpolygonContractAddress, zkpolygonNode, zkpolygonErc20OutputColumn, tokens, stableTokens)
+  }
+
+  if(activeSheet.getRange(getNextColumn(scrollErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец SCROLL ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, scrollErc20OutputColumn+5, "SCROLL", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "SCROLL", scrollContractAddress, scrollNode, scrollErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(mantleErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец MANTLE ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, mantleErc20OutputColumn+5, "MANTLE", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "MANTLE", mantleContractAddress, mantleNode, mantleErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(opbnbErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец OPBNB ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, opbnbErc20OutputColumn+5, "OPBNB", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "OPBNB", opbnbContractAddress, opbnbNode, opbnbErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(celoErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец CELO ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, celoErc20OutputColumn+5, "CELO", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "CELO", celoContractAddress, celoNode, celoErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(harmonyErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец HARMONY ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, harmonyErc20OutputColumn+5, "HARMONY", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "HARMONY", harmonyContractAddress, harmonyNode, harmonyErc20OutputColumn, tokens, stableTokens)
+  }
+
+  if(activeSheet.getRange(getNextColumn(coreErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец CORE ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, coreErc20OutputColumn+5, "CORE", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "CORE", coreContractAddress, coreNode, coreErc20OutputColumn, tokens, stableTokens)
+  }
+  if(activeSheet.getRange(getNextColumn(gnosisErc20OutputColumn)+5).getValue()) {
+    spreadsheet.toast('Обновляю столбец GNOSIS ERC20', 'Информация');
+    selectedValue = updateDropdown(activeSheet, gnosisErc20OutputColumn+5, "GNOSIS", tokens)
+    getErc20Balance(activeSheet, customLastContentLine, selectedValue, "GNOSIS", gnosisContractAddress, gnosisNode, gnosisErc20OutputColumn, tokens, stableTokens)
+  }
+}
+
+
+function clear() {
+  var app = SpreadsheetApp;
+  var activeSheet = app.getActiveSpreadsheet().getSheetByName(mainSheetName);
+  var customLastContentLine = getRows(activeSheet)
+
+  activeSheet.getRange("C6:BP" + (customLastContentLine+5)).setValue('');
+  activeSheet.getRange("BR6:DE" + (customLastContentLine+5)).setValue('');
+}
+
+function getRows() {
+  var app = SpreadsheetApp;
+  var activeSheet = app.getActiveSpreadsheet().getSheetByName(mainSheetName);
+  var numberOfRows = activeSheet.getRange(rowCountCell).getValue();
+  return numberOfRows;
+}
+
+function updateRows() {
+  var app = SpreadsheetApp;
+  var activeSheet = app.getActiveSpreadsheet().getSheetByName(mainSheetName);
+
+  var numberOfRowsToAdd = activeSheet.getRange(rowCountCell).getValue();
+  var currentRowCount = activeSheet.getLastRow() - 5 - 2;
+
+  if (numberOfRowsToAdd > currentRowCount) {
+    var templateRowRange = activeSheet.getRange("A15:DH15");
+    var lastDataRow = activeSheet.getLastRow() - 2;
+    var endRowRange = activeSheet.getRange("A" + (lastDataRow + 1) + ":DH" + (lastDataRow + 2));
+    endRowRange.moveTo(activeSheet.getRange(lastDataRow + numberOfRowsToAdd - currentRowCount + 1, 1));
+
+    for (var i = 0; i < numberOfRowsToAdd - currentRowCount; i++) {
+      var newRow = templateRowRange.copyTo(activeSheet.getRange(lastDataRow + 1 + i, 1));
+    }
+    updateSum(activeSheet, numberOfRowsToAdd)
+  } else if (numberOfRowsToAdd < currentRowCount) {
+    if (numberOfRowsToAdd > 19) {
+      var rowsToDelete = currentRowCount - numberOfRowsToAdd;
+    } else {
+      var rowsToDelete = currentRowCount - 20;
+    }
+    var lastDataRow = activeSheet.getLastRow() - 2;
+    activeSheet.deleteRows(lastDataRow - rowsToDelete + 1, rowsToDelete);
+    updateSum(activeSheet, numberOfRowsToAdd)
+  } else {
+    SpreadsheetApp.getUi().alert("Уведомление", "First add new 'ROW COUNT' value !!! (column O1)", SpreadsheetApp.getUi().ButtonSet.OK);
+  }
+  return numberOfRowsToAdd;
+}
+
+
+function updateSum(activeSheet, customLastContentLine) {
+  firstColumn = "C"
+  sumRow = customLastContentLine + 5 + 2
+  for (var i = 0; i < 110; i++) {
+    activeSheet.getRange(firstColumn+sumRow).setFormula("=SUM(" + firstColumn + "6:" + firstColumn + (customLastContentLine+5) + ")");
+    firstColumn = getNextColumn(firstColumn)
+  }
+}
+
+function updateDropdown(activeSheet, cell, selectedNetwork, tokens) {
+  var dropdownCell = activeSheet.getRange(cell);
+  var selectedValue = dropdownCell.getValue();
+
+  var networkTokens = tokens[selectedNetwork];
+  var tokenNames = Object.keys(networkTokens);
+  var validationRule = SpreadsheetApp.newDataValidation().requireValueInList(tokenNames).setAllowInvalid(false).build();
+  
+  dropdownCell.clearDataValidations();
+  
+  dropdownCell.setDataValidation(validationRule);
+
+  return selectedValue
+}
+
+
+function getTokensData(activeSheet, customLastContentLine) {
+  var numNetworks = 20;
+  var numTokens = 30;      //customLastContentLine;
+  var currentColumn = "C"
+  var tokens = {};
+
+  for (var i = 0; i < numNetworks; i++) {
+    var nextColumn = getNextColumn(currentColumn);
+    var networkName = activeSheet.getRange(currentColumn+3).getValue();
+    var networkTokens = {};
+    networkTokens["ALL STABLES"] = "";
+    networkTokens["ALL TOKENS"] = "";
+
+    for (var j = 5; j < numTokens+5; j++) {
+      var tokenName = activeSheet.getRange(currentColumn+j).getValue(); 
+      var tokenContract = activeSheet.getRange(nextColumn+j).getValue();
+      if (tokenName !== "" && tokenContract !== "") {
+        networkTokens[tokenName] = tokenContract;
+      }
+    }
+    tokens[networkName] = networkTokens;
+    var currentColumn = getNextColumn(nextColumn);
+  }
+  return tokens;
+}
+
+
+function getStablesData(activeSheet) {
+  var numTokens = 30;
+  var currentColumn = "A"
+  var stablecoins = [];
+
+  for (var j = 5; j < numTokens+5; j++) {
+    var tokenName = activeSheet.getRange(currentColumn+j).getValue(); 
+    if (tokenName !== "") {
+      stablecoins.push(tokenName)
+    }
+  }
+  return stablecoins;
+}
+
+
+function getBalance(activeSheet, customLastContentLine, tokenAddress, contractAddress, nodeUrl, outputColumn) {
+  var addressesColumn = activeSheet.getRange("B6:B" + (customLastContentLine+5)).getValues();   //[[addr],[addr]...] 
+  var batchAddresses = [];
+  var results = [];
+  
+  for (var i = 0; i < addressesColumn.length; i++) {
+    var address = addressesColumn[i][0];
+    if (address !== "") {
+      batchAddresses.push(address);
+    } else {
+      batchAddresses.push("0x0000000000000000000133722813372281337228")
+    }
+    if (batchAddresses.length === batchContractBalanceSize || i === addressesColumn.length - 1) {
+      if (nodeUrl !== zksyncNode) {
+        var batchResults = sendCallRequest(batchAddresses, tokenAddress, contractAddress, nodeUrl);
+      } else {
+        var batchResults = getZksyncv1BalanceRequest(batchAddresses, nodeUrl)
+      }
+      results = results.concat(batchResults);
+      batchAddresses = [];
+    }
+  }
+
+  for (var j = 0; j < results.length; j++) {
+    var rowIndex = j + 6
+    var resultValue = results[j]/1000000000000000000;
+    activeSheet.getRange(outputColumn + rowIndex).setValue(resultValue);
+  }
+}
+
+
+function getErc20Balance(activeSheet, customLastContentLine, selectedValue, selectedNetwork, contractAddress, nodeUrl, outputColumn, tokens, stableTokens) {
+  var addressesColumn = activeSheet.getRange("B6:B" + (customLastContentLine + 5)).getValues();   //[[addr],[addr]...] 
+  var batchAddresses = [];
+  var results = [];
+  var tokenAddresses = [];
+  var tokenNames = [];
+
+  if (selectedValue === "ALL STABLES") {
+    for (var i = 0; i < stableTokens.length; i++) {
+      var tokenName = stableTokens[i];
+      if (tokens[selectedNetwork][tokenName]) {
+        tokenAddresses.push(tokens[selectedNetwork][tokenName]);
+      }
+    }
+  } else if (selectedValue === "ALL TOKENS") {
+    for (const tokenName in tokens[selectedNetwork]) {
+      if (tokenName !== "ALL STABLES" && tokenName !== "ALL TOKENS") {
+        tokenNames.push(tokenName);
+        tokenAddresses.push(tokens[selectedNetwork][tokenName]);
+      }
+    }
+  } else {
+    tokenAddresses.push(tokens[selectedNetwork][selectedValue]);
+  }
+
+  if (tokenAddresses.length > 0) {
+    decimalsData = getErc20DecimalsRequest(tokenAddresses, nodeUrl)
+  }
+
+  for (var i = 0; i < addressesColumn.length; i++) {
+    var address = addressesColumn[i][0];
+    if (address !== "") {
+      batchAddresses.push(address);
+    } else {
+      batchAddresses.push("0x0000000000000000000133722813372281337228");
+    }
+    if (batchAddresses.length === batchContractBalanceSize || i === addressesColumn.length - 1) {
+      var temp_results = Array(batchAddresses.length).fill(0); 
+      var all_tokens_temp_results = Array.from({ length: batchAddresses.length }, () => []);
+      for (var j = 0; j < tokenAddresses.length; j++) {
+        var tokenAddress = tokenAddresses[j];
+        var batchResults = sendCallRequest(batchAddresses, tokenAddress, contractAddress, nodeUrl);
+        if (selectedValue === "ALL TOKENS") {
+          for (var k = 0; k < batchResults.length; k++) {
+            all_tokens_temp_results[k].push(parseFloat(batchResults[k]) / Math.pow(10, decimalsData[j]));
+          }
+        } else {
+          for (var k = 0; k < batchResults.length; k++) {
+            temp_results[k] += parseFloat(batchResults[k]) / Math.pow(10, decimalsData[j]);
+          }
+        }
+      }
+      if (selectedValue === "ALL TOKENS") {
+        results = results.concat(all_tokens_temp_results);
+        //SpreadsheetApp.getUi().alert("Уведомление", JSON.stringify(results), SpreadsheetApp.getUi().ButtonSet.OK);
+      } else {
+        results = results.concat(temp_results);
+      }
+      batchAddresses = [];
+    }
+  }
+
+  for (var j = 0; j < results.length; j++) {
+    var rowIndex = j + 6
+    if (selectedValue === "ALL TOKENS") {
+      activeSheet.getRange(outputColumn + rowIndex).setValue('Total price here ->');
+    } else {
+      var resultValue = results[j];
+      activeSheet.getRange(outputColumn + rowIndex).setValue(resultValue);
+    }
+  }
+  
+  if (selectedValue === "ALL STABLES") {
+    calculateUsdValues(activeSheet, customLastContentLine, outputColumn, 'USDT', stableTokens)
+  } else if (selectedValue === "ALL TOKENS") {
+    calculateAllTokensUsdValues(activeSheet, customLastContentLine, outputColumn, tokenNames, results, stableTokens)
+  } else {
+    calculateUsdValues(activeSheet, customLastContentLine, outputColumn, selectedValue, stableTokens)
+  }
+}
+
+
+function calculateAllTokensUsdValues(activeSheet, customLastContentLine, inputColumn, tickers, results, stableTokens) {
+  var outputColumn = getNextColumn(inputColumn);
+
+  var averagePrices = tickers.map(ticker => getAveragePrice(ticker, stableTokens));
+  var values = results.map(subarray => {
+    return subarray.reduce((sum, value, index) => {
+      return sum + value * averagePrices[index];
+    }, 0);
+  });
+  valuesArray = values.map(value => [value]);
+  //SpreadsheetApp.getUi().alert("Уведомление", JSON.stringify(valuesArray), SpreadsheetApp.getUi().ButtonSet.OK);
+  activeSheet.getRange(outputColumn + "6:" + outputColumn + (customLastContentLine + 5)).setValues(valuesArray);
+}
+
+
+function calculateUsdValues(activeSheet, customLastContentLine, inputColumn, ticker, stableTokens) {
+  var outputColumn = getNextColumn(inputColumn);
+  var averagePrice = getAveragePrice(ticker, stableTokens);
+  var values = activeSheet.getRange(inputColumn + "6:" + inputColumn + (customLastContentLine + 5)).getValues();
+
+  if (averagePrice !== null) {
+    for (var i = 0; i < values.length; i++) {
+      var quantity = values[i][0];
+      var calculatedValue = quantity * averagePrice;
+      values[i][0] = calculatedValue;
+    }
+    activeSheet.getRange(outputColumn + "6:" + outputColumn + (customLastContentLine + 5)).setValues(values);
+
+  } else {
+    for (var i = 0; i < values.length; i++) {
+      values[i][0] = 0;
+    }
+    activeSheet.getRange(outputColumn + "6:" + outputColumn + (customLastContentLine + 5)).setValues(values);
+  }
+}
+
+
+function getErc20DecimalsRequest(batchAddresses, nodeUrl) {
+  var requestData = generateDecimalsRequestData(batchAddresses)
+  var response = UrlFetchApp.fetch(nodeUrl, { method: "post", contentType: "application/json", payload: requestData });
+  var json = response.getContentText();
+  var data = JSON.parse(json);
+
+  //SpreadsheetApp.getUi().alert("Уведомление", requestData, SpreadsheetApp.getUi().ButtonSet.OK);
+  //SpreadsheetApp.getUi().alert("Уведомление", json, SpreadsheetApp.getUi().ButtonSet.OK);
+
+  return data.map(entry => parseInt(entry.result, 16));
+}
+
+
+function generateDecimalsRequestData(batchAddresses) {
+  const requestArray = batchAddresses.map((address, index) => {
+    const requestId = index + 1;
+    return {
+      jsonrpc: "2.0",
+      id: requestId,
+      method: "eth_call",
+      params: [
+        {
+          "to": address, 
+          "data": "0x313ce567"
+        },
+        "latest"
+      ],
+    };
+  });
+  return JSON.stringify(requestArray, null, 2);
+}
+
+
+function sendCallRequest(batchAddresses, tokenAddress, contractAddress, nodeUrl) {
+  var amountHexString = batchAddresses.length.toString(16);
+  var amountString = amountHexString.padStart(64, '0');
+
+  var gas = 128 + (batchAddresses.length-1) * 32
+  var gasHexString = gas.toString(16);
+  var gasString = gasHexString.padStart(64, '0');
+
+  var requestData = {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "eth_call",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "data":"0xf0002ea90000000000000000000000000000000000000000000000000000000000000040" + gasString + amountString + generateAddressData(batchAddresses) + "0000000000000000000000000000000000000000000000000000000000000001" + "000000000000000000000000" + tokenAddress.substring(2),
+        "to": contractAddress
+      },
+      "latest"
+    ]
+  };
+  var response = UrlFetchApp.fetch(nodeUrl, { method: "post", contentType: "application/json", payload: JSON.stringify(requestData) });
+  var json = response.getContentText();
+  var data = JSON.parse(json);
+
+  //SpreadsheetApp.getUi().alert("Уведомление", JSON.stringify(requestData), SpreadsheetApp.getUi().ButtonSet.OK);
+  //SpreadsheetApp.getUi().alert("Уведомление", json, SpreadsheetApp.getUi().ButtonSet.OK);
+
+  var result = [];
+  if (data && data.result) {
+    var resultHex = data.result;
+    var valuesCount = batchAddresses.length+2;
+    for (var i = 2; i < valuesCount; i++) {
+      var startIndex = i * 64 + 2;
+      var endIndex = startIndex + 64;
+      var hexValue = resultHex.substring(startIndex, endIndex);
+      var decimalValue = parseInt(hexValue, 16);
+      result.push(decimalValue);
+    }
+  }
+  return result;
+}
+
+
+function generateAddressData(batchAddresses) {
+  var addressData = "";
+  batchAddresses.forEach(function(address) {
+    addressData += "000000000000000000000000" + address.substring(2);
+  });
+  return addressData;
+}
+
+
+function updateInfo(activeSheet) {
+  var watermark1 = activeSheet.getRange("A1").getValue();
+  var example1 = "Creator:  t.me/cryptogovnozavod";
+  var watermark2 = activeSheet.getRange("F1").getValue();
+  var example2 = "DONATE (any chain):";
+  var watermark3 = activeSheet.getRange("I1").getValue();
+  var example3 = "0xd8dcc73675a36f618fe780049429ec66f8402199";
+  if (watermark1 !== example1) {
+    activeSheet.getRange("A1").setValue(example1);
+  }
+  if (watermark2 !== example2) {
+    activeSheet.getRange("F1").setValue(example2);
+  }
+  if (watermark3 !== example3) {
+    activeSheet.getRange("I1").setValue(example3);
+  }
+}
+
+
+function getAveragePrice(ticker, stableTokens) {
+  try {
+    if (ticker == 'NoPrice') {
+      return 0;
+    }
+    if (ticker == 'WETH') {
+      ticker = "ETH";
+    }
+    if (ticker == 'WBTC') {
+      ticker = "BTC";
+    }
+    if (stableTokens.indexOf(ticker) !== -1) {
+      return 1;
+    }
+    var apiUrl = "https://api.mexc.com/api/v3/avgPrice?symbol=" + ticker + "USDT";
+    // SpreadsheetApp.getUi().alert("Уведомление", apiUrl, SpreadsheetApp.getUi().ButtonSet.OK);
+    var response = UrlFetchApp.fetch(apiUrl);
+    var json = response.getContentText();
+    var data = JSON.parse(json);
+  
+    if (data && data.price) {
+      return parseFloat(data.price);
+    } else {
+      return 0;
+    }
+  } catch (error) {
+    var errorMessage = "Цена данного тикера " + ticker + " не определена и будет считаться 0. Убедитесь, что он назван верно и есть у mexc: https://api.mexc.com/api/v3/avgPrice?symbol=" + ticker + "USDT";
+    SpreadsheetApp.getUi().alert("Уведомление", errorMessage, SpreadsheetApp.getUi().ButtonSet.OK);
+    return 0;
+  }
+}
+
+
+// function getAveragePrice(ticker) {
+//   var apiUrl = "https://api.coinbase.com/v2/exchange-rates?currency=" + ticker;
+//   var response = UrlFetchApp.fetch(apiUrl);
+//   var json = response.getContentText();
+//   var data = JSON.parse(json);
+  
+//   if (data && data.data && data.data.rates && data.data.rates.USD) {
+//     return parseFloat(data.data.rates.USDT);
+//   } else {
+//     return 0;
+//   }
+// }
+
+
+function getNextColumn(column) {
+  var charCount = column.length;
+  var nextCharCode = column.charCodeAt(charCount - 1) + 1;
+  if (nextCharCode > 90) {
+    var carry = 1;
+    var nextColumn = '';
+    for (var i = charCount - 1; i >= 0; i--) {
+      var charCode = column.charCodeAt(i) + carry;
+      
+      if (charCode > 90) {
+        charCode = 65;
+      } else {
+        carry = 0;
+      }
+      nextColumn = String.fromCharCode(charCode) + nextColumn;
+    }
+    if (carry === 1) {
+      nextColumn = 'A' + nextColumn;
+    }
+    return nextColumn;
+  } else {
+    return column.substring(0, charCount - 1) + String.fromCharCode(nextCharCode);
+  }
+}
+
+
+function getTxCount(activeSheet, customLastContentLine, nodeUrl, inputColumn) {
+  var outputColumn = getNextColumn(getNextColumn(inputColumn));
+  var addressesColumn = activeSheet.getRange("B6:B" + (customLastContentLine+5)).getValues();   //[[addr],[addr]...] 
+  var batchAddresses = [];
+  var results = [];
+  
+  for (var i = 0; i < addressesColumn.length; i++) {
+    var address = addressesColumn[i][0];
+    if (address !== "") {
+      batchAddresses.push(address);
+    } else {
+      batchAddresses.push("0x0000000000000000000133722813372281337228")
+    }
+    if (batchAddresses.length === batchRpcTxCountSize || i === addressesColumn.length - 1) {
+      var batchResults = getTxCountRequest(batchAddresses, nodeUrl);
+      results = results.concat(batchResults);
+      batchAddresses = [];
+    }
+  }
+
+  for (var j = 0; j < results.length; j++) {
+    var rowIndex = j + 6
+    var resultValue = results[j];
+    activeSheet.getRange(outputColumn + rowIndex).setValue(resultValue);
+  }
+}
+
+
+function getTxCountRequest(batchAddresses, nodeUrl) {
+  if (nodeUrl !== zksyncNode) {
+    var requestData = generateRequestData(batchAddresses)
+    var response = UrlFetchApp.fetch(nodeUrl, { method: "post", contentType: "application/json", payload: requestData });
+    var json = response.getContentText();
+    var data = JSON.parse(json);
+
+    //SpreadsheetApp.getUi().alert("Уведомление", requestData, SpreadsheetApp.getUi().ButtonSet.OK);
+    //SpreadsheetApp.getUi().alert("Уведомление", json, SpreadsheetApp.getUi().ButtonSet.OK);
+
+    if (Array.isArray(data)) {
+      return data.map(entry => parseInt(entry.result, 16));
+    } else {
+      return getTxCountRequest(batchAddresses, nodeUrl);
+    }
+
+  } else {
+    var requestData = generateZksyncRequestData(batchAddresses)
+    var response = UrlFetchApp.fetch(nodeUrl, { method: "post", contentType: "application/json", payload: requestData });
+    var json = response.getContentText();
+    var data = JSON.parse(json);
+
+    //SpreadsheetApp.getUi().alert("Уведомление", requestData, SpreadsheetApp.getUi().ButtonSet.OK);
+    //SpreadsheetApp.getUi().alert("Уведомление", json, SpreadsheetApp.getUi().ButtonSet.OK);
+
+    if (Array.isArray(data)) {
+      return data.map(entry => entry.result.committed.nonce);
+    } else {
+      return getTxCountRequest(batchAddresses, nodeUrl);
+    }
+
+  }
+}
+
+
+function generateRequestData(batchAddresses) {
+  const requestArray = batchAddresses.map((address, index) => {
+    const requestId = index + 1;
+    return {
+      jsonrpc: "2.0",
+      id: requestId,
+      method: "eth_getTransactionCount",
+      params: [
+        address, 
+        "latest"
+      ]
+    };
+  });
+  return JSON.stringify(requestArray, null, 2);
+}
+
+
+function getZksyncv1BalanceRequest(batchAddresses, nodeUrl) {
+  var requestData = generateZksyncRequestData(batchAddresses)
+  var response = UrlFetchApp.fetch(nodeUrl, { method: "post", contentType: "application/json", payload: requestData });
+  var json = response.getContentText();
+  var data = JSON.parse(json);
+
+  //SpreadsheetApp.getUi().alert("Уведомление", requestData, SpreadsheetApp.getUi().ButtonSet.OK);
+  //SpreadsheetApp.getUi().alert("Уведомление", json, SpreadsheetApp.getUi().ButtonSet.OK);
+
+  return data.map(entry => entry.result.committed.balances.hasOwnProperty("ETH") ? entry.result.committed.balances.ETH : 0);
+}
+
+
+function generateZksyncRequestData(batchAddresses) {
+  const requestArray = batchAddresses.map((address, index) => {
+    const requestId = index + 1;
+    return {
+      jsonrpc: "2.0",
+      id: requestId,
+      method: "account_info",
+      params: [
+        address
+      ]
+    };
+  });
+  return JSON.stringify(requestArray, null, 2);
+}
+
+
+
+ 
+
